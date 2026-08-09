@@ -300,12 +300,12 @@
             <svg class="absolute hidden md:block bottom-0 right-[15%] w-12 h-12 animate-pulse text-kpop-pink" fill="currentColor" viewBox="0 0 24 24" style="animation-delay: 1s;"><path d="M12 0l2.5 9.5L24 12l-9.5 2.5L12 24l-2.5-9.5L0 12l9.5-2.5z"/></svg>
         </div>
 
-        <!-- Category Filter (Mockup) -->
-        <div class="flex flex-wrap justify-center gap-4 mb-12">
-            <button class="memphis-btn bg-kpop-pink px-6 py-2 rounded-full font-bold">Todos</button>
-            <button class="memphis-btn bg-kpop-dark border-kpop-purple px-6 py-2 rounded-full font-bold text-gray-300 hover:text-white hover:bg-kpop-purple">Álbumes</button>
-            <button class="memphis-btn bg-kpop-dark border-kpop-purple px-6 py-2 rounded-full font-bold text-gray-300 hover:text-white hover:bg-kpop-purple">Lightsticks</button>
-            <button class="memphis-btn bg-kpop-dark border-kpop-purple px-6 py-2 rounded-full font-bold text-gray-300 hover:text-white hover:bg-kpop-purple">Photocards</button>
+        <!-- Category Filter -->
+        <div id="category-filters" class="flex flex-wrap justify-center gap-4 mb-12">
+            <button data-category="Todos" class="filter-btn memphis-btn bg-kpop-pink px-6 py-2 rounded-full font-bold text-white">Todos</button>
+            <button data-category="Álbumes" class="filter-btn memphis-btn bg-kpop-dark border-kpop-purple px-6 py-2 rounded-full font-bold text-gray-300 hover:text-white hover:bg-kpop-purple">Álbumes</button>
+            <button data-category="Lightsticks" class="filter-btn memphis-btn bg-kpop-dark border-kpop-purple px-6 py-2 rounded-full font-bold text-gray-300 hover:text-white hover:bg-kpop-purple">Lightsticks</button>
+            <button data-category="Photocards" class="filter-btn memphis-btn bg-kpop-dark border-kpop-purple px-6 py-2 rounded-full font-bold text-gray-300 hover:text-white hover:bg-kpop-purple">Photocards</button>
         </div>
 
         <!-- Product Grid -->
@@ -430,6 +430,54 @@
         </div>
     </div>
 
+    <!-- AI Chatbot Widget -->
+    <div id="ai-chat-widget" class="fixed bottom-5 right-5 z-50 flex flex-col items-end pointer-events-none">
+        
+        <!-- Chat Window (Hidden by default) -->
+        <div id="ai-chat-window" class="bg-kpop-dark border-2 border-kpop-purple shadow-[6px_6px_0_0_#ec4899] rounded-xl w-80 sm:w-96 mb-4 flex flex-col hidden pointer-events-auto transition-transform origin-bottom-right transform scale-0 duration-300 overflow-hidden h-[450px]">
+            <!-- Header -->
+            <div class="bg-kpop-purple p-3 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-kpop-pink rounded-full flex items-center justify-center text-white border-2 border-white shadow-[2px_2px_0_0_#0f0c20]">
+                        <i class="fas fa-robot text-sm"></i>
+                    </div>
+                    <span class="font-bold text-white font-heading">HallyuBot AI</span>
+                </div>
+                <button id="ai-close-btn" class="text-white hover:text-kpop-pink transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Messages Area -->
+            <div id="ai-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-900/80">
+                <!-- Initial Welcome Message -->
+                <div class="flex items-start gap-2">
+                    <div class="bg-kpop-purple text-white p-2 px-3 rounded-lg rounded-tl-none text-sm max-w-[85%] shadow-[2px_2px_0_0_#c084fc]">
+                        ¡Hola! 👋 Soy HallyuBot. ¿Qué grupo de K-Pop te gusta? ¡Puedo ayudarte a encontrar merch en la tienda!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-3 border-t border-kpop-purple bg-kpop-dark flex gap-2">
+                <input type="text" id="ai-input" class="flex-1 bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-kpop-pink focus:ring-1 focus:ring-kpop-pink transition-colors" placeholder="Escribe tu mensaje...">
+                <button id="ai-send-btn" class="bg-kpop-pink text-white px-3 py-2 rounded-lg font-bold hover:bg-pink-400 transition-colors border border-transparent hover:border-white shadow-[2px_2px_0_0_#c084fc]">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Floating Toggle Button -->
+        <button id="ai-toggle-btn" class="pointer-events-auto memphis-btn bg-kpop-pink text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl relative animate-bounce hover:animate-none group">
+            <i class="fas fa-comment-dots group-hover:hidden"></i>
+            <i class="fas fa-robot hidden group-hover:block"></i>
+            <span class="absolute -top-1 -right-1 flex h-4 w-4">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-4 w-4 bg-kpop-accent border border-white"></span>
+            </span>
+        </button>
+    </div>
+
     <script>
         // ============================================================================
         // 🛍️ CONFIGURACIÓN DE LA TIENDA Y CATÁLOGO DE PRODUCTOS 🛍️
@@ -529,9 +577,15 @@
         const finalCheckoutBtn = document.getElementById('final-checkout-btn');
 
         // --- 4. Render Products ---
-        function renderProducts() {
+        function renderProducts(category = 'Todos') {
             productGrid.innerHTML = '';
-            products.forEach(product => {
+            
+            // Filter products based on selected category
+            const filteredProducts = category === 'Todos' 
+                ? products 
+                : products.filter(p => p.category === category);
+
+            filteredProducts.forEach(product => {
                 const card = document.createElement('div');
                 card.className = 'product-card rounded-xl overflow-hidden flex flex-col h-full';
                 
@@ -772,6 +826,193 @@
         checkoutModal.addEventListener('click', (e) => {
             if (e.target === checkoutModal) closeCheckoutModal();
         });
+
+        // --- 8. Category Filtering Logic ---
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const category = e.target.getAttribute('data-category');
+                
+                // Update active styles for buttons
+                filterBtns.forEach(b => {
+                    b.classList.remove('bg-kpop-pink', 'text-white');
+                    b.classList.add('bg-kpop-dark', 'text-gray-300');
+                });
+                e.target.classList.remove('bg-kpop-dark', 'text-gray-300');
+                e.target.classList.add('bg-kpop-pink', 'text-white');
+                
+                // Re-render products based on the selected category
+                renderProducts(category);
+            });
+        });
+
+        // ============================================================================
+        // 🤖 ASISTENTE VIRTUAL AI (GEMINI) 🤖
+        // ============================================================================
+        
+        const aiToggleBtn = document.getElementById('ai-toggle-btn');
+        const aiCloseBtn = document.getElementById('ai-close-btn');
+        const aiChatWindow = document.getElementById('ai-chat-window');
+        const aiMessages = document.getElementById('ai-messages');
+        const aiInput = document.getElementById('ai-input');
+        const aiSendBtn = document.getElementById('ai-send-btn');
+        
+        // Gemini API Configuration
+        const aiApiKey = ""; // API key is injected by the environment
+        const aiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${aiApiKey}`;
+        
+        let aiChatHistory = [];
+        let isAiThinking = false;
+
+        // Fetch with exponential backoff for rate limiting
+        async function fetchWithRetry(url, options, maxRetries = 3) {
+            let delay = 1000;
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.status === 429) throw new Error("Rate limited");
+                    return response;
+                } catch (err) {
+                    if (i === maxRetries - 1) throw err;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2; // Exponential backoff
+                }
+            }
+        }
+
+        function getSystemInstruction() {
+            // Create a string representation of the current catalog
+            const catalogString = products.map(p => 
+                `- ${p.name} (Categoría: ${p.category}, Precio: $${p.price}, Estado: ${p.stock ? 'Disponible' : 'Agotado'})`
+            ).join('\n');
+
+            return `Eres HallyuBot, un asistente virtual hiper-entusiasta y amable para la tienda de K-Pop "Hallyu Shop". 
+Tu objetivo es ayudar a los usuarios a elegir productos, dar recomendaciones basadas en sus gustos musicales y responder preguntas sobre K-Pop.
+Habla en español de forma juvenil, usa emojis (✨, 💜, 🎶, etc.) y mantén tus respuestas concisas (máximo 2-3 oraciones).
+
+ESTE ES NUESTRO INVENTARIO ACTUAL:
+${catalogString}
+
+REGLAS:
+1. Solo recomienda productos que estén en el inventario actual.
+2. Si recomiendas un producto, menciona su precio.
+3. Si un producto está "Agotado", dile al cliente que por ahora no hay stock pero que puede revisar otros.
+4. Si el cliente quiere comprar, indícale que agregue los productos al carrito y presione "Pedir por WhatsApp".`;
+        }
+
+        function toggleAiChat() {
+            const isHidden = aiChatWindow.classList.contains('hidden');
+            if (isHidden) {
+                aiChatWindow.classList.remove('hidden');
+                // Trigger animation in next frame
+                setTimeout(() => {
+                    aiChatWindow.classList.remove('scale-0');
+                    aiChatWindow.classList.add('scale-100');
+                }, 10);
+                aiToggleBtn.classList.remove('animate-bounce');
+            } else {
+                aiChatWindow.classList.remove('scale-100');
+                aiChatWindow.classList.add('scale-0');
+                setTimeout(() => {
+                    aiChatWindow.classList.add('hidden');
+                }, 300); // Wait for transition
+            }
+        }
+
+        function appendMessage(sender, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex items-start gap-2 ${sender === 'user' ? 'justify-end' : ''}`;
+            
+            const bubbleClasses = sender === 'user' 
+                ? 'bg-kpop-pink text-white rounded-tr-none shadow-[2px_2px_0_0_#0f0c20]' 
+                : 'bg-kpop-purple text-white rounded-tl-none shadow-[2px_2px_0_0_#c084fc]';
+            
+            msgDiv.innerHTML = `
+                <div class="p-2 px-3 rounded-lg text-sm max-w-[85%] ${bubbleClasses}">
+                    ${text}
+                </div>
+            `;
+            aiMessages.appendChild(msgDiv);
+            aiMessages.scrollTop = aiMessages.scrollHeight;
+        }
+
+        function appendTypingIndicator() {
+            const id = 'typing-' + Date.now();
+            const msgDiv = document.createElement('div');
+            msgDiv.id = id;
+            msgDiv.className = 'flex items-start gap-2';
+            msgDiv.innerHTML = `
+                <div class="bg-gray-700 text-white p-2 px-3 rounded-lg rounded-tl-none text-sm max-w-[85%] flex gap-1 items-center">
+                    <span class="animate-bounce inline-block w-1.5 h-1.5 bg-white rounded-full"></span>
+                    <span class="animate-bounce inline-block w-1.5 h-1.5 bg-white rounded-full" style="animation-delay: 0.1s"></span>
+                    <span class="animate-bounce inline-block w-1.5 h-1.5 bg-white rounded-full" style="animation-delay: 0.2s"></span>
+                </div>
+            `;
+            aiMessages.appendChild(msgDiv);
+            aiMessages.scrollTop = aiMessages.scrollHeight;
+            return id;
+        }
+
+        async function handleAiSubmit() {
+            const text = aiInput.value.trim();
+            if (!text || isAiThinking) return;
+
+            // 1. Add User Message
+            appendMessage('user', text);
+            aiInput.value = '';
+            isAiThinking = true;
+
+            // 2. Add to Chat History
+            aiChatHistory.push({ role: "user", parts: [{ text: text }] });
+
+            // 3. Show typing indicator
+            const typingId = appendTypingIndicator();
+
+            // 4. Prepare API Payload
+            const payload = {
+                contents: aiChatHistory,
+                systemInstruction: {
+                    parts: [{ text: getSystemInstruction() }]
+                }
+            };
+
+            // 5. Fetch from Gemini API
+            try {
+                const response = await fetchWithRetry(aiApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                // Remove typing indicator
+                document.getElementById(typingId)?.remove();
+
+                if (result.candidates && result.candidates[0]?.content?.parts?.[0]?.text) {
+                    const aiReply = result.candidates[0].content.parts[0].text;
+                    appendMessage('ai', aiReply);
+                    aiChatHistory.push({ role: "model", parts: [{ text: aiReply }] });
+                } else {
+                    throw new Error("Invalid response format");
+                }
+            } catch (error) {
+                document.getElementById(typingId)?.remove();
+                appendMessage('ai', '¡Uy! 😰 Hubo un error de conexión, el internet está tan inestable como los servidores cuando hay venta de entradas. ¡Intenta de nuevo en un momento!');
+            } finally {
+                isAiThinking = false;
+            }
+        }
+
+        // AI Event Listeners
+        aiToggleBtn.addEventListener('click', toggleAiChat);
+        aiCloseBtn.addEventListener('click', toggleAiChat);
+        aiSendBtn.addEventListener('click', handleAiSubmit);
+        aiInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleAiSubmit();
+        });
+
 
         // Initialize Particles.js
         particlesJS('particles-js', {
