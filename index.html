@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hallyu Shop - K-Pop Store</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kpop-purple': '#6b21a8', // Purple 800
+                        'kpop-dark': '#0f0c20',   // Deep dark purple background
+                        'kpop-accent': '#c084fc', // Purple 400
+                        'kpop-pink': '#ec4899',   // Pink 500
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Space Grotesk', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0f0c20;
+            color: #ffffff;
+            margin: 0;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Memphis Style Background Patterns */
+        .memphis-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            opacity: 0.15;
+            background-image: 
+                radial-gradient(#c084fc 2px, transparent 2px),
+                radial-gradient(#ec4899 2px, transparent 2px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+
+        .memphis-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            border: 3px solid;
+            opacity: 0.2;
+        }
+
+        .shape-circle {
+            border-radius: 50%;
+            border-color: #ec4899;
+            width: 50px;
+            height: 50px;
+            top: 20%;
+            left: 10%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape-square {
+            border-color: #c084fc;
+            width: 40px;
+            height: 40px;
+            top: 70%;
+            right: 15%;
+            transform: rotate(45deg);
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        .shape-triangle {
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-bottom: 43px solid #38bdf8;
+            border-top: none;
+            background-color: transparent;
+            top: 40%;
+            right: 30%;
+            animation: float 7s ease-in-out infinite;
+        }
+
+        /* --- K-Drama / Webtoon Vector Styles --- */
+        .kdrama-vector {
+            position: absolute;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.6;
+            filter: drop-shadow(4px 4px 0px rgba(192, 132, 252, 0.5));
+        }
+
+        .vector-sparkle {
+            animation: pulse-spin 4s linear infinite;
+        }
+
+        .vector-bubble {
+            animation: float-bubble 6s ease-in-out infinite;
+        }
+
+        .vector-petal {
+            animation: fall-sway 10s linear infinite;
+        }
+
+        @keyframes float-bubble {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+
+        @keyframes pulse-spin {
+            0% { transform: scale(0.8) rotate(0deg); opacity: 0.4; }
+            50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+            100% { transform: scale(0.8) rotate(360deg); opacity: 0.4; }
+        }
+
+        @keyframes fall-sway {
+            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateY(110vh) translateX(50px) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            top: 0;
+            left: 0;
+        }
+
+        /* Product Card Styling */
+        .product-card {
+            background: rgba(30, 27, 75, 0.7); /* Deep purple transparent */
+            backdrop-filter: blur(10px);
+            border: 2px solid #6b21a8;
+            box-shadow: 8px 8px 0px 0px #ec4899; /* Memphis style shadow */
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px) translateX(-5px);
+            box-shadow: 13px 13px 0px 0px #ec4899;
+        }
+
+        /* Cart Sidebar */
+        #cart-sidebar {
+            transition: transform 0.3s ease-in-out;
+            background: rgba(15, 12, 32, 0.95);
+            backdrop-filter: blur(15px);
+            border-left: 3px solid #c084fc;
+        }
+
+        .cart-open {
+            transform: translateX(0);
+        }
+
+        .cart-closed {
+            transform: translateX(100%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f0c20;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #6b21a8;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c084fc;
+        }
+        
+        .memphis-btn {
+            border: 2px solid #fff;
+            box-shadow: 4px 4px 0px 0px #c084fc;
+            transition: all 0.2s;
+        }
+        .memphis-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px 0px #c084fc;
+        }
+        .memphis-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px #c084fc;
+        }
+    </style>
+</head>
+<body class="antialiased relative">
+
+    <div class="memphis-pattern"></div>
+    
+    <!-- K-Drama / Webtoon Style Vectors Background -->
+    <div class="memphis-shapes fixed inset-0 overflow-hidden pointer-events-none z-[-1]">
+        <!-- Original geometric shapes modified -->
+        <div class="shape shape-circle" style="opacity: 0.1;"></div>
+        <div class="shape shape-triangle" style="opacity: 0.1;"></div>
+
+        <!-- Webtoon Speech Bubble (Top Left) -->
+        <svg class="kdrama-vector vector-bubble" style="top: 15%; left: 8%; width: 120px;" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 50C10 27.9086 27.9086 10 50 10C72.0914 10 90 27.9086 90 50C90 72.0914 72.0914 90 50 90H20L10 100V50Z" stroke="#ec4899" stroke-width="4" fill="rgba(30, 27, 75, 0.8)"/>
+            <text x="50" y="55" font-family="Space Grotesk" font-weight="bold" font-size="24" fill="#c084fc" text-anchor="middle">안녕!</text>
+        </svg>
+
+        <!-- K-Drama Sparkle (Top Right) -->
+        <svg class="kdrama-vector vector-sparkle" style="top: 20%; right: 12%; width: 60px;" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 0L57 35L95 40L63 60L70 95L50 70L30 95L37 60L5 40L43 35L50 0Z" fill="#38bdf8" stroke="#ffffff" stroke-width="2"/>
+        </svg>
+
+        <!-- Romantic Cherry Blossom Petals (Falling) -->
+        <svg class="kdrama-vector vector-petal" style="top: -10%; left: 30%; width: 30px; animation-delay: 0s;" viewBox="0 0 50 50" fill="#f472b6" xmlns="http://www.w3.org/2000/svg">
+            <path d="M25 0C10 10 0 25 15 40C25 50 40 40 45 25C50 10 35 0 25 0Z"/>
+        </svg>
+        <svg class="kdrama-vector vector-petal" style="top: -10%; right: 40%; width: 25px; animation-delay: 3s;" viewBox="0 0 50 50" fill="#ec4899" xmlns="http://www.w3.org/2000/svg">
+            <path d="M25 0C10 10 0 25 15 40C25 50 40 40 45 25C50 10 35 0 25 0Z"/>
+        </svg>
+        <svg class="kdrama-vector vector-petal" style="top: -10%; left: 70%; width: 35px; animation-delay: 6s;" viewBox="0 0 50 50" fill="#f472b6" xmlns="http://www.w3.org/2000/svg">
+            <path d="M25 0C10 10 0 25 15 40C25 50 40 40 45 25C50 10 35 0 25 0Z"/>
+        </svg>
+
+        <!-- Webtoon Heart Box (Bottom Right) -->
+        <svg class="kdrama-vector vector-bubble" style="bottom: 15%; right: 5%; width: 90px; animation-delay: 1.5s;" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="20" width="80" height="60" rx="10" stroke="#c084fc" stroke-width="4" fill="rgba(30, 27, 75, 0.8)"/>
+            <path d="M50 65L47.1 62.3C36.8 53 30 46.8 30 39C30 32.8 34.8 28 41 28C44.5 28 47.8 29.6 50 32.2C52.2 29.6 55.5 28 59 28C65.2 28 70 32.8 70 39C70 46.8 63.2 53 52.9 62.4L50 65Z" fill="#ec4899"/>
+        </svg>
+    </div>
+
+    <div id="particles-js"></div>
+
+    <header class="sticky top-0 z-40 bg-kpop-dark/80 backdrop-blur-md border-b border-kpop-purple px-4 py-4 md:px-8">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-kpop-pink rounded-full flex items-center justify-center text-white font-bold text-xl border-2 border-white shadow-[2px_2px_0_0_#c084fc]">
+                    H
+                </div>
+                <h1 class="text-3xl font-heading font-bold text-transparent bg-clip-text bg-gradient-to-r from-kpop-accent to-kpop-pink tracking-tight">
+                    Hallyu Shop
+                </h1>
+            </div>
+            
+            <button id="cart-toggle" class="relative group memphis-btn bg-kpop-purple px-4 py-2 rounded-lg flex items-center gap-2">
+                <i class="fas fa-shopping-cart text-white"></i>
+                <span class="font-bold hidden sm:inline">Carrito</span>
+                <span id="cart-count" class="absolute -top-3 -right-3 bg-kpop-pink text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center border-2 border-kpop-dark">
+                    0
+                </span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-12 md:px-8 relative z-10">
+        
+        <!-- Hero Section with K-Drama Illustration -->
+        <div class="text-center mb-16 relative">
+            <!-- Decorative Manga Sparkle left of title -->
+            <svg class="absolute hidden md:block top-0 left-[15%] w-16 h-16 animate-pulse text-kpop-accent" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0l2.5 9.5L24 12l-9.5 2.5L12 24l-2.5-9.5L0 12l9.5-2.5z"/></svg>
+            
+            <h2 class="text-4xl md:text-6xl font-heading font-extrabold mb-4 uppercase tracking-wider text-white drop-shadow-[4px_4px_0_#ec4899] relative z-10">
+                Tu Obsesión <br/><span class="text-kpop-accent">K-Pop</span> Empieza Aquí
+            </h2>
+            <p class="text-gray-300 max-w-2xl mx-auto text-lg md:text-xl relative z-10">
+                Descubre los últimos álbumes, lightsticks oficiales y merch exclusiva de tus grupos favoritos.
+            </p>
+
+            <!-- Decorative Manga Sparkle right of text -->
+            <svg class="absolute hidden md:block bottom-0 right-[15%] w-12 h-12 animate-pulse text-kpop-pink" fill="currentColor" viewBox="0 0 24 24" style="animation-delay: 1s;"><path d="M12 0l2.5 9.5L24 12l-9.5 2.5L12 24l-2.5-9.5L0 12l9.5-2.5z"/></svg>
+        </div>
+
+        <!-- Category Filter (Mockup) -->
+        <div class="flex flex-wrap justify-center gap-4 mb-12">
+            <button class="memphis-btn bg-kpop-pink px-6 py-2 rounded-full font-bold">Todos</button>
+            <button class="memphis-btn bg-kpop-dark border-kpop-purple px-6 py-2 rounded-full font-bold text-gray-300 hover:text-white hover:bg-kpop-purple">Álbumes</button>
+            <button class="memphis-btn bg-kpop-dark border-kpop-purple px-6 py-2 rounded-full font-bold text-gray-300 hover:text-white hover:bg-kpop-purple">Lightsticks</button>
+            <button class="memphis-btn bg-kpop-dark border-kpop-purple px-6 py-2 rounded-full font-bold text-gray-300 hover:text-white hover:bg-kpop-purple">Photocards</button>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <!-- Products will be injected here by JavaScript -->
+        </div>
+
+    </main>
+
+    <footer class="bg-black/50 border-t border-kpop-purple py-8 mt-20 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex justify-center gap-6 mb-6">
+                <a href="#" class="text-gray-400 hover:text-kpop-pink text-2xl transition-colors"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-gray-400 hover:text-kpop-pink text-2xl transition-colors"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-gray-400 hover:text-kpop-pink text-2xl transition-colors"><i class="fab fa-tiktok"></i></a>
+            </div>
+            <p class="text-gray-500">© 2026 Hallyu Shop. Todos los derechos reservados.</p>
+            <p class="text-gray-600 text-sm mt-2">No somos una tienda oficial, pero somos 100% fans.</p>
+        </div>
+    </footer>
+
+    <!-- Cart Sidebar overlay -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black/60 z-40 hidden backdrop-blur-sm transition-opacity"></div>
+
+    <!-- Cart Sidebar -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full sm:w-[400px] z-50 cart-closed shadow-2xl flex flex-col">
+        <div class="p-5 border-b border-kpop-purple flex justify-between items-center bg-kpop-dark">
+            <h2 class="text-2xl font-heading font-bold flex items-center gap-2">
+                <i class="fas fa-shopping-bag text-kpop-accent"></i> Tu Carrito
+            </h2>
+            <button id="close-cart" class="text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Cart Items Container -->
+        <div id="cart-items-container" class="flex-1 overflow-y-auto p-5 space-y-4">
+            <!-- Cart items will be injected here -->
+            <div id="empty-cart-msg" class="text-center text-gray-400 mt-10">
+                <i class="fas fa-box-open text-4xl mb-4 text-kpop-purple"></i>
+                <p>Tu carrito está vacío.</p>
+                <p class="text-sm mt-2">¡Agrega algo de merch!</p>
+            </div>
+        </div>
+
+        <!-- Cart Footer / Checkout -->
+        <div class="p-5 border-t border-kpop-purple bg-kpop-dark">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-gray-300 font-bold">Total:</span>
+                <span id="cart-total" class="text-2xl font-heading font-bold text-kpop-pink">$0.00</span>
+            </div>
+            
+            <p class="text-xs text-gray-400 mb-4 text-center">
+                El pago se coordinará a través de WhatsApp.
+            </p>
+
+            <button id="checkout-btn" class="w-full memphis-btn bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-bold text-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fab fa-whatsapp text-xl"></i>
+                Pedir por WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <!-- Message Box (replaces alert) -->
+    <div id="message-box" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-kpop-purple text-white px-6 py-3 rounded-lg shadow-[4px_4px_0_0_#ec4899] border-2 border-white z-50 translate-y-[200%] transition-transform duration-300 flex items-center gap-3">
+        <i class="fas fa-info-circle"></i>
+        <span id="message-text">Mensaje</span>
+    </div>
+
+    <!-- Checkout Modal Overlay -->
+    <div id="checkout-modal" class="fixed inset-0 bg-black/80 z-[60] hidden backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-kpop-dark border-2 border-kpop-purple rounded-xl shadow-[8px_8px_0_0_#ec4899] max-w-lg w-full max-h-[90vh] flex flex-col relative overflow-hidden">
+            <!-- Modal Header -->
+            <div class="p-5 border-b border-kpop-purple flex justify-between items-center bg-gray-900/50">
+                <h3 class="text-2xl font-heading font-bold text-white flex items-center gap-2">
+                    <i class="fas fa-clipboard-list text-kpop-accent"></i> Detalles de Envío
+                </h3>
+                <button id="close-modal" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-5 overflow-y-auto flex-1 space-y-6">
+                <div class="bg-kpop-purple/20 border border-kpop-purple p-4 rounded-lg">
+                    <h4 class="font-bold text-kpop-pink mb-2"><i class="fas fa-info-circle mr-1"></i> Instrucciones de Compra</h4>
+                    <p class="text-sm text-gray-300">
+                        1. Completa tus datos de envío.<br>
+                        2. Revisa que tu pedido esté correcto.<br>
+                        3. Haz clic en <strong>"Copiar y Enviar a WhatsApp"</strong>.<br>
+                        4. Pega el mensaje en nuestro chat de WhatsApp para coordinar el pago (Aceptamos Transferencia y Efectivo contra entrega).
+                    </p>
+                </div>
+
+                <form id="checkout-form" class="space-y-4">
+                    <div>
+                        <label for="customer-name" class="block text-sm font-bold text-gray-300 mb-1">Nombre Completo *</label>
+                        <input type="text" id="customer-name" required class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-kpop-accent focus:ring-1 focus:ring-kpop-accent transition-colors placeholder-gray-500" placeholder="Ej. Lisa Manoban">
+                    </div>
+                    <div>
+                        <label for="customer-phone" class="block text-sm font-bold text-gray-300 mb-1">Teléfono de Contacto *</label>
+                        <input type="tel" id="customer-phone" required class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-kpop-accent focus:ring-1 focus:ring-kpop-accent transition-colors placeholder-gray-500" placeholder="Ej. 8888-8888">
+                    </div>
+                    <div>
+                        <label for="customer-address" class="block text-sm font-bold text-gray-300 mb-1">Dirección de Envío Exacta *</label>
+                        <textarea id="customer-address" required rows="3" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-kpop-accent focus:ring-1 focus:ring-kpop-accent transition-colors placeholder-gray-500 resize-none" placeholder="Incluye ciudad, barrio, y referencias..."></textarea>
+                    </div>
+                    <div>
+                        <label for="customer-notes" class="block text-sm font-bold text-gray-300 mb-1">Notas adicionales (Opcional)</label>
+                        <textarea id="customer-notes" rows="2" class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-kpop-accent focus:ring-1 focus:ring-kpop-accent transition-colors placeholder-gray-500 resize-none" placeholder="Ej. Envío para regalo..."></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-5 border-t border-kpop-purple bg-gray-900/50">
+                <button id="final-checkout-btn" class="w-full memphis-btn bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-bold text-lg flex items-center justify-center gap-2">
+                    <i class="fab fa-whatsapp text-xl"></i>
+                    Copiar Datos y Abrir WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // 🛍️ CONFIGURACIÓN DE LA TIENDA Y CATÁLOGO DE PRODUCTOS 🛍️
+        // ============================================================================
+        
+        // 📱 Número de WhatsApp de la tienda (Incluye el código de país, ej: 505 para Nicaragua)
+        const storeWhatsAppNumber = "50588888888"; 
+
+        // 📦 INSTRUCCIONES PARA ACTUALIZAR PRODUCTOS EN GITHUB PAGES:
+        // Para cambiar los productos que aparecen en tu página, modifica esta lista (Array).
+        // Cada producto está entre llaves { }.
+        // 
+        // - name: El nombre del producto.
+        // - category: La categoría (Álbumes, Lightsticks, etc.).
+        // - price: El precio en números (sin el símbolo $).
+        // - image: AQUÍ PONES LA IMAGEN DE REFERENCIA. Pega el enlace URL de la imagen de tu producto.
+        //          (Puedes usar enlaces de Imgur, Google Photos, o subir tus imágenes a tu repositorio de Github).
+        // - stock: ESTO ACTUALIZA EL INVENTARIO.
+        //          Escribe 'true' si el producto está DISPONIBLE.
+        //          Escribe 'false' si el producto está AGOTADO (desactivará el botón de compra).
+        // ============================================================================
+
+        const products = [
+            {
+                id: 'p1',
+                name: 'NewJeans - OMG (1st Single Album)',
+                category: 'Álbumes',
+                price: 24.99,
+                // Cambia este enlace por la URL de tu imagen real
+                image: 'https://placehold.co/400x400/ec4899/ffffff?text=NewJeans+OMG', 
+                stock: true // true = Disponible, false = Agotado
+            },
+            {
+                id: 'p2',
+                name: 'BLACKPINK Official Lightstick Ver. 2',
+                category: 'Lightsticks',
+                price: 55.00,
+                // Cambia este enlace por la URL de tu imagen real
+                image: 'https://placehold.co/400x400/c084fc/ffffff?text=BP+Lightstick',
+                stock: true
+            },
+            {
+                id: 'p3',
+                name: 'Stray Kids - 5-STAR (3rd Album)',
+                category: 'Álbumes',
+                price: 28.50,
+                image: 'https://placehold.co/400x400/38bdf8/ffffff?text=Stray+Kids',
+                stock: true
+            },
+            {
+                id: 'p4',
+                name: 'TWICE Candybong Z',
+                category: 'Lightsticks',
+                price: 52.00,
+                image: 'https://placehold.co/400x400/f472b6/ffffff?text=Candybong',
+                stock: false // Al poner false, el sistema lo marcará como "Agotado" automáticamente
+            },
+            {
+                id: 'p5',
+                name: 'BTS - Proof (Anthology Album)',
+                category: 'Álbumes',
+                price: 65.00,
+                image: 'https://placehold.co/400x400/6b21a8/ffffff?text=BTS+Proof',
+                stock: true
+            },
+            {
+                id: 'p6',
+                name: 'Set Photocards Random (5pcs)',
+                category: 'Photocards',
+                price: 12.00,
+                image: 'https://placehold.co/400x400/0f0c20/ffffff?text=Photocards',
+                stock: true
+            }
+        ];
+
+        // --- 2. State Management ---
+        let cart = [];
+
+        // --- 3. DOM Elements ---
+        const productGrid = document.getElementById('product-grid');
+        const cartToggleBtn = document.getElementById('cart-toggle');
+        const closeCartBtn = document.getElementById('close-cart');
+        const cartSidebar = document.getElementById('cart-sidebar');
+        const cartOverlay = document.getElementById('cart-overlay');
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        const emptyCartMsg = document.getElementById('empty-cart-msg');
+        const cartCount = document.getElementById('cart-count');
+        const cartTotal = document.getElementById('cart-total');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        
+        // Modal Elements
+        const checkoutModal = document.getElementById('checkout-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const checkoutForm = document.getElementById('checkout-form');
+        const finalCheckoutBtn = document.getElementById('final-checkout-btn');
+
+        // --- 4. Render Products ---
+        function renderProducts() {
+            productGrid.innerHTML = '';
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card rounded-xl overflow-hidden flex flex-col h-full';
+                
+                const stockBadge = product.stock 
+                    ? `<span class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full border border-white">En Stock</span>`
+                    : `<span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full border border-white">Agotado</span>`;
+
+                const btnDisabled = product.stock ? '' : 'disabled';
+                const btnClass = product.stock 
+                    ? 'bg-kpop-accent hover:bg-kpop-pink text-white memphis-btn' 
+                    : 'bg-gray-600 text-gray-400 cursor-not-allowed';
+
+                card.innerHTML = `
+                    <div class="relative pt-[100%] overflow-hidden bg-gray-800">
+                        <img src="${product.image}" alt="${product.name}" class="absolute inset-0 w-full h-full object-cover">
+                        ${stockBadge}
+                    </div>
+                    <div class="p-5 flex flex-col flex-grow">
+                        <span class="text-xs font-bold text-kpop-accent uppercase tracking-wider mb-1">${product.category}</span>
+                        <h3 class="text-lg font-bold text-white mb-2 leading-tight flex-grow">${product.name}</h3>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-xl font-heading font-bold text-white">$${product.price.toFixed(2)}</span>
+                            <button onclick="addToCart('${product.id}')" ${btnDisabled} class="px-4 py-2 rounded-lg font-bold text-sm transition-colors ${btnClass}">
+                                <i class="fas fa-plus mr-1"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                productGrid.appendChild(card);
+            });
+        }
+
+        // --- 5. Cart Logic ---
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product || !product.stock) return;
+
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            
+            updateCartUI();
+            showMessage(`"${product.name}" agregado al carrito`);
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartUI();
+        }
+
+        function changeQuantity(productId, delta) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    updateCartUI();
+                }
+            }
+        }
+
+        function updateCartUI() {
+            // Update count
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            
+            // Animate bump on count
+            cartCount.classList.add('scale-150');
+            setTimeout(() => cartCount.classList.remove('scale-150'), 200);
+
+            // Update Total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotal.textContent = `$${total.toFixed(2)}`;
+
+            // Checkout button state
+            checkoutBtn.disabled = cart.length === 0;
+
+            // Render Items
+            const itemsToKeep = Array.from(cartItemsContainer.children).filter(el => el.id !== 'empty-cart-msg');
+            itemsToKeep.forEach(el => el.remove());
+
+            if (cart.length === 0) {
+                emptyCartMsg.style.display = 'block';
+            } else {
+                emptyCartMsg.style.display = 'none';
+                
+                cart.forEach(item => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'flex gap-3 bg-gray-800/50 p-3 rounded-lg border border-gray-700';
+                    itemEl.innerHTML = `
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-md border border-gray-600">
+                        <div class="flex-1 flex flex-col justify-between">
+                            <h4 class="text-sm font-bold text-white leading-tight line-clamp-2">${item.name}</h4>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-kpop-accent font-bold text-sm">$${(item.price * item.quantity).toFixed(2)}</span>
+                                <div class="flex items-center gap-2 bg-black/40 rounded-lg px-2 py-1">
+                                    <button onclick="changeQuantity('${item.id}', -1)" class="text-gray-400 hover:text-white"><i class="fas fa-minus text-xs"></i></button>
+                                    <span class="text-sm font-bold w-4 text-center">${item.quantity}</span>
+                                    <button onclick="changeQuantity('${item.id}', 1)" class="text-gray-400 hover:text-white"><i class="fas fa-plus text-xs"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart('${item.id}')" class="text-gray-500 hover:text-red-500 self-start p-1 transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
+                    cartItemsContainer.appendChild(itemEl);
+                });
+            }
+        }
+
+        // --- 6. WhatsApp Checkout Logic ---
+        function openCheckoutModal() {
+            if (cart.length === 0) return;
+            // Close cart sidebar
+            cartSidebar.classList.remove('cart-open');
+            cartSidebar.classList.add('cart-closed');
+            cartOverlay.classList.add('hidden');
+            
+            // Open Modal
+            checkoutModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCheckoutModal() {
+            checkoutModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function generateOrderMessage() {
+            const name = document.getElementById('customer-name').value.trim();
+            const phone = document.getElementById('customer-phone').value.trim();
+            const address = document.getElementById('customer-address').value.trim();
+            const notes = document.getElementById('customer-notes').value.trim();
+
+            if(!name || !phone || !address) {
+                showMessage("Por favor, completa los campos obligatorios (*)");
+                return null;
+            }
+
+            let message = `¡Hola Hallyu Shop! 👋\nQuiero realizar el siguiente pedido:\n\n`;
+            message += `*📝 DATOS DEL CLIENTE*\n`;
+            message += `*Nombre:* ${name}\n`;
+            message += `*Teléfono:* ${phone}\n`;
+            message += `*Dirección:* ${address}\n`;
+            if(notes) message += `*Notas:* ${notes}\n`;
+            
+            message += `\n*🛒 DETALLE DEL PEDIDO*\n`;
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                message += `${index + 1}. ${item.name}\n`;
+                message += `   Cant: ${item.quantity} x $${item.price.toFixed(2)} = $${(item.quantity * item.price).toFixed(2)}\n`;
+                total += (item.quantity * item.price);
+            });
+
+            message += `\n*Total a pagar: $${total.toFixed(2)}*\n\n`;
+            message += `Quedo a la espera de confirmación y métodos de pago. ¡Gracias! ✨`;
+            
+            return message;
+        }
+
+        function processFinalCheckout() {
+            const message = generateOrderMessage();
+            if(!message) return; // Validation failed
+
+            // 1. Copy to clipboard
+            // Fallback for older browsers or iframe restrictions
+            const textArea = document.createElement("textarea");
+            textArea.value = message;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showMessage("¡Pedido copiado! Abriendo WhatsApp...");
+                
+                // 2. Open WhatsApp after a short delay
+                setTimeout(() => {
+                    const encodedMessage = encodeURIComponent(message);
+                    const whatsappUrl = `https://wa.me/${storeWhatsAppNumber}?text=${encodedMessage}`;
+                    window.open(whatsappUrl, '_blank');
+                    closeCheckoutModal();
+                }, 1500);
+
+            } catch (err) {
+                showMessage("Error al copiar. Redirigiendo a WhatsApp...");
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/${storeWhatsAppNumber}?text=${encodedMessage}`;
+                window.open(whatsappUrl, '_blank');
+                closeCheckoutModal();
+            } finally {
+                document.body.removeChild(textArea);
+            }
+        }
+
+        // --- 7. UI Interactions & Animations ---
+        function toggleCart() {
+            const isOpen = cartSidebar.classList.contains('cart-open');
+            if (isOpen) {
+                cartSidebar.classList.remove('cart-open');
+                cartSidebar.classList.add('cart-closed');
+                cartOverlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            } else {
+                cartSidebar.classList.remove('cart-closed');
+                cartSidebar.classList.add('cart-open');
+                cartOverlay.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            }
+        }
+
+        function showMessage(text) {
+            messageText.textContent = text;
+            messageBox.classList.remove('translate-y-[200%]');
+            
+            setTimeout(() => {
+                messageBox.classList.add('translate-y-[200%]');
+            }, 3000);
+        }
+
+        // Event Listeners
+        cartToggleBtn.addEventListener('click', toggleCart);
+        closeCartBtn.addEventListener('click', toggleCart);
+        cartOverlay.addEventListener('click', () => {
+            if(cartSidebar.classList.contains('cart-open')) toggleCart();
+        });
+        
+        // Changed checkout listener
+        checkoutBtn.addEventListener('click', openCheckoutModal);
+        
+        // Modal Listeners
+        closeModalBtn.addEventListener('click', closeCheckoutModal);
+        finalCheckoutBtn.addEventListener('click', processFinalCheckout);
+        checkoutModal.addEventListener('click', (e) => {
+            if (e.target === checkoutModal) closeCheckoutModal();
+        });
+
+        // Initialize Particles.js
+        particlesJS('particles-js', {
+            "particles": {
+                "number": {
+                    "value": 40,
+                    "density": { "enable": true, "value_area": 800 }
+                },
+                "color": { "value": ["#c084fc", "#ec4899", "#38bdf8"] },
+                "shape": {
+                    "type": ["circle", "triangle", "edge"],
+                    "stroke": { "width": 0, "color": "#000000" },
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": true,
+                    "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false }
+                },
+                "size": {
+                    "value": 5,
+                    "random": true,
+                    "anim": { "enable": false }
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#6b21a8",
+                    "opacity": 0.4,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 2,
+                    "direction": "none",
+                    "random": true,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": { "enable": true, "mode": "grab" },
+                    "onclick": { "enable": true, "mode": "push" },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": { "distance": 140, "line_linked": { "opacity": 1 } },
+                    "push": { "particles_nb": 4 }
+                }
+            },
+            "retina_detect": true
+        });
+
+        // Initial render
+        window.onload = () => {
+            renderProducts();
+            updateCartUI(); // Ensure initial state is correct
+        };
+
+    </script>
+</body>
+</html>
